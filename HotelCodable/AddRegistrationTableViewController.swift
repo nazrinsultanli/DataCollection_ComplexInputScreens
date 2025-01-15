@@ -195,4 +195,9 @@ class AddRegistrationTableViewController: UITableViewController, SelectRoomTypeT
         
         return selectRoomTypeController
     }
+    
+    @IBAction func cancelButtonTapped(_ sender: Any) {
+        dismiss(animated: true)
+    }
+    
 }

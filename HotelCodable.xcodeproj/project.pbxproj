@@ -7,6 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		1045B59C2D384B300072FFDD /* RoomType.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1045B59B2D384B300072FFDD /* RoomType.swift */; };
+		1045B59E2D384C670072FFDD /* SelectRoomTypeTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1045B59D2D384C670072FFDD /* SelectRoomTypeTableViewController.swift */; };
 		1081555B2D36F78100B471A5 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1081555A2D36F78100B471A5 /* AppDelegate.swift */; };
 		1081555D2D36F78100B471A5 /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1081555C2D36F78100B471A5 /* SceneDelegate.swift */; };
 		108155622D36F78100B471A5 /* Base in Resources */ = {isa = PBXBuildFile; fileRef = 108155612D36F78100B471A5 /* Base */; };
@@ -17,6 +19,8 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		1045B59B2D384B300072FFDD /* RoomType.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RoomType.swift; sourceTree = "<group>"; };
+		1045B59D2D384C670072FFDD /* SelectRoomTypeTableViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SelectRoomTypeTableViewController.swift; sourceTree = "<group>"; };
 		108155572D36F78100B471A5 /* HotelCodable.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = HotelCodable.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		1081555A2D36F78100B471A5 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		1081555C2D36F78100B471A5 /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
@@ -60,6 +64,8 @@
 			children = (
 				1081555A2D36F78100B471A5 /* AppDelegate.swift */,
 				1081555C2D36F78100B471A5 /* SceneDelegate.swift */,
+				1045B59B2D384B300072FFDD /* RoomType.swift */,
+				1045B59D2D384C670072FFDD /* SelectRoomTypeTableViewController.swift */,
 				10BC7CDB2D36FA1A00D3508B /* AddRegistrationTableViewController.swift */,
 				10BC7CD92D36F82400D3508B /* Registration.swift */,
 				108155602D36F78100B471A5 /* Main.storyboard */,
@@ -141,8 +147,10 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				1045B59E2D384C670072FFDD /* SelectRoomTypeTableViewController.swift in Sources */,
 				1081555B2D36F78100B471A5 /* AppDelegate.swift in Sources */,
 				10BC7CDA2D36F82400D3508B /* Registration.swift in Sources */,
+				1045B59C2D384B300072FFDD /* RoomType.swift in Sources */,
 				10BC7CDC2D36FA1A00D3508B /* AddRegistrationTableViewController.swift in Sources */,
 				1081555D2D36F78100B471A5 /* SceneDelegate.swift in Sources */,
 			);

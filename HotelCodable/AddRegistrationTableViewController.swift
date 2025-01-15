@@ -7,7 +7,12 @@
 
 import UIKit
 
-class AddRegistrationTableViewController: UITableViewController {
+protocol SelectRoomTypeTableControllerDelegate: AnyObject {
+    func selectRoomTypeTableController(_ controller: SelectRoomTypeTableViewController, didSelect roomType: RoomType)
+}
+
+class AddRegistrationTableViewController: UITableViewController, SelectRoomTypeTableControllerDelegate {
+  
     @IBOutlet var firstNameTextField: UITextField!
     @IBOutlet var lastNameTextField: UITextField!
     @IBOutlet var emailTextField: UITextField!
@@ -16,6 +21,15 @@ class AddRegistrationTableViewController: UITableViewController {
     @IBOutlet var checkInDatePicker: UIDatePicker!
     @IBOutlet var checkOutDateLabel: UILabel!
     @IBOutlet var checkOutDatePicker: UIDatePicker!
+    
+    @IBOutlet var numberOfAdultsLabel: UILabel!
+    @IBOutlet var numberOfAdultsStepper: UIStepper!
+    @IBOutlet var numberOfChildrenLabel: UILabel!
+    @IBOutlet var numberOfChildrenStepper: UIStepper!
+    
+    @IBOutlet weak var wifiSwitch: UISwitch!
+    
+    @IBOutlet weak var roomTypeLabel: UILabel!
     
     let checkInDatePickerCellIndexPath = IndexPath(row: 1, section: 1)
     let checkOutDatePickerCellIndexPath = IndexPath(row: 3, section: 1)
@@ -35,16 +49,40 @@ class AddRegistrationTableViewController: UITableViewController {
         }
     }
     
+    var roomType: RoomType?
     override func viewDidLoad() {
         super.viewDidLoad()
         let midNightToday = Calendar.current.startOfDay(for: Date())
         checkInDatePicker.minimumDate = midNightToday
         checkInDatePicker.date = midNightToday
         updateDateViews()
-        
+        updateNumberOfGuests()
+        updateRoomType()
         
     }
 
+    var registration: Registration? {
+        guard let roomType = roomType else { return nil }
+        
+        let firstName = firstNameTextField.text ?? ""
+        let lastName = lastNameTextField.text ?? ""
+        let email = emailTextField.text ?? ""
+        let checkInDate = checkInDatePicker.date
+        let checkOutDate = checkOutDatePicker.date
+        let numberOfAdults = Int(numberOfAdultsStepper.value)
+        let numberOfChildren = Int(numberOfChildrenStepper.value)
+        let hasWifi = wifiSwitch.isOn
+        
+        return Registration(firstName: firstName,
+                            lastName: lastName,
+                            emailAddress: email,
+                            checkInDate: checkInDate,
+                            checkOutDate: checkOutDate,
+                            numberOfAdults: numberOfAdults,
+                            numberOfChildren: numberOfChildren,
+                            wifi: hasWifi,
+                            roomType: roomType)
+    }
 
     func updateDateViews() {
         checkOutDatePicker.minimumDate = Calendar.current.date(byAdding: .day, value: 1, to: checkInDatePicker.date)
@@ -59,6 +97,10 @@ class AddRegistrationTableViewController: UITableViewController {
         let email = emailTextField.text ?? ""
         let checkInDate = checkInDatePicker.date
         let checkOutDate = checkOutDatePicker.date
+        let numberOfAdults = Int(numberOfAdultsStepper.value)
+        let numberOfChildren = Int(numberOfChildrenStepper.value)
+        let hasWifi = wifiSwitch.isOn
+        let roomChoice = roomType?.name ?? "Not Set"
         
         print("DONE TAPPED")
         print("firstName: \(firstName)")
@@ -66,6 +108,10 @@ class AddRegistrationTableViewController: UITableViewController {
         print("email: \(email)")
         print("checkIn: \(checkInDate)")
         print("checkOut: \(checkOutDate)")
+        print("numberOfAdults: \(numberOfAdults)")
+        print("numberOfChildren: \(numberOfChildren)")
+        print("Wifi: \(hasWifi)")
+        print("roomType: \(roomChoice)")
     }
  
     @IBAction func DateInPickerValueChanged(_ sender: UIDatePicker) {
@@ -115,5 +161,38 @@ class AddRegistrationTableViewController: UITableViewController {
         }
         tableView.beginUpdates()
         tableView.endUpdates()
+    }
+    
+    func updateNumberOfGuests() {    numberOfAdultsLabel.text = "\(Int(numberOfAdultsStepper.value))"
+        numberOfChildrenLabel.text = "\(Int(numberOfChildrenStepper.value))"
+    }
+    @IBAction func stepperValueChangedAdults(_ sender: UIStepper) {
+        updateNumberOfGuests()
+    }
+    @IBAction func stepperValueChangedChildren(_ sender: UIStepper) {
+        updateNumberOfGuests()
+    }
+    @IBAction func wifiSwitchChanged(_ sender: UISwitch) {
+
+    }
+    
+    func updateRoomType() {
+        if let roomType = roomType {
+            roomTypeLabel.text = roomType.name
+        } else {
+            roomTypeLabel.text = "Not Set"
+        }
+    }
+    func selectRoomTypeTableController(_ controller: SelectRoomTypeTableViewController, didSelect roomType: RoomType) {
+        self.roomType = roomType
+        updateRoomType() 
+    }
+    
+    @IBSegueAction func selectRoomType(_ coder: NSCoder) -> SelectRoomTypeTableViewController? {
+        let selectRoomTypeController = SelectRoomTypeTableViewController(coder: coder)
+        selectRoomTypeController?.delegate = self
+        selectRoomTypeController?.roomType = roomType
+        
+        return selectRoomTypeController
     }
 }

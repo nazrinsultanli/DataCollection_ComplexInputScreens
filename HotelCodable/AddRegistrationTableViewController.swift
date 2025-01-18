@@ -13,6 +13,7 @@ protocol SelectRoomTypeTableControllerDelegate: AnyObject {
 
 class AddRegistrationTableViewController: UITableViewController, SelectRoomTypeTableControllerDelegate {
   
+    @IBOutlet weak var doneButton: UIBarButtonItem!
     @IBOutlet var firstNameTextField: UITextField!
     @IBOutlet var lastNameTextField: UITextField!
     @IBOutlet var emailTextField: UITextField!
@@ -37,6 +38,15 @@ class AddRegistrationTableViewController: UITableViewController, SelectRoomTypeT
     let checkInDateLabelCellIndexPath = IndexPath(row: 0, section: 1)
     let checkOutDateLabelCellIndexPath = IndexPath(row: 2, section: 1)
     
+    
+    @IBOutlet var chargesNumberOfNightsLabel: UILabel!
+    @IBOutlet var chargesNumberOfNightsDetailLabel: UILabel!
+    @IBOutlet var chargesRoomRateLabel: UILabel!
+    @IBOutlet var chargesRoomTypeLabel: UILabel!
+    @IBOutlet var chargesWifiRateLabel: UILabel!
+    @IBOutlet var chargesWifiDetailLabel: UILabel!
+    @IBOutlet var chargesTotalLabel: UILabel!
+    
     var isCheckInDatePickerVisible: Bool = false {
         didSet {
             checkInDatePicker.isHidden = !isCheckInDatePickerVisible
@@ -50,16 +60,7 @@ class AddRegistrationTableViewController: UITableViewController, SelectRoomTypeT
     }
     
     var roomType: RoomType?
-    override func viewDidLoad() {
-        super.viewDidLoad()
-        let midNightToday = Calendar.current.startOfDay(for: Date())
-        checkInDatePicker.minimumDate = midNightToday
-        checkInDatePicker.date = midNightToday
-        updateDateViews()
-        updateNumberOfGuests()
-        updateRoomType()
-        
-    }
+
 
     var registration: Registration? {
         guard let roomType = roomType else { return nil }
@@ -83,6 +84,75 @@ class AddRegistrationTableViewController: UITableViewController, SelectRoomTypeT
                             wifi: hasWifi,
                             roomType: roomType)
     }
+    var existingRegistration: Registration?
+    
+//    override func viewDidLoad() {
+//        super.viewDidLoad()
+//        if let existingRegistration = existingRegistration {
+//            title = "View Guest Registration"
+//            doneButton.isEnabled = false
+//            
+//            roomType = existingRegistration.roomType
+//            firstNameTextField.text = existingRegistration.firstName
+//            lastNameTextField.text = existingRegistration.lastName
+//            emailTextField.text = existingRegistration.emailAddress
+//            checkInDatePicker.date = existingRegistration.checkInDate
+//            checkOutDatePicker.date = existingRegistration.checkOutDate
+//            numberOfAdultsStepper.value = Double(existingRegistration.numberOfAdults)
+//            numberOfChildrenStepper.value = Double(existingRegistration.numberOfChildren)
+//            wifiSwitch.isOn = existingRegistration.wifi
+//        } else {
+//            let midnightToday = Calendar.current.startOfDay(for: Date())
+//            checkInDatePicker.minimumDate = midnightToday
+//            checkInDatePicker.date = midnightToday
+//        }
+//        
+//        let midNightToday = Calendar.current.startOfDay(for: Date())
+//        checkInDatePicker.minimumDate = midNightToday
+//        checkInDatePicker.date = midNightToday
+//        updateDateViews()
+//        updateNumberOfGuests()
+//        updateRoomType()
+//        
+//    }
+
+    override func viewDidLoad() {
+        super.viewDidLoad()
+        
+        if let existingRegistration = existingRegistration {
+            title = "View Guest Registration"
+            roomType = existingRegistration.roomType
+            
+            // Populate the fields with existing registration data
+            firstNameTextField.text = existingRegistration.firstName
+            lastNameTextField.text = existingRegistration.lastName
+            emailTextField.text = existingRegistration.emailAddress
+            checkInDatePicker.date = existingRegistration.checkInDate
+            checkOutDatePicker.date = existingRegistration.checkOutDate
+            numberOfAdultsStepper.value = Double(existingRegistration.numberOfAdults)
+            numberOfChildrenStepper.value = Double(existingRegistration.numberOfChildren)
+            wifiSwitch.isOn = existingRegistration.wifi
+            
+            // Update labels and views
+            updateDateViews()
+            updateNumberOfGuests()
+            updateRoomType()
+            updateChargesSection()
+            
+            // Disable "Done" button if just viewing
+            doneButton.isEnabled = false
+        } else {
+            let midnightToday = Calendar.current.startOfDay(for: Date())
+            checkInDatePicker.minimumDate = midnightToday
+            checkInDatePicker.date = midnightToday
+            
+            // Update default views
+            updateDateViews()
+            updateNumberOfGuests()
+            updateRoomType()
+            updateChargesSection()
+        }
+    }
 
     func updateDateViews() {
         checkOutDatePicker.minimumDate = Calendar.current.date(byAdding: .day, value: 1, to: checkInDatePicker.date)
@@ -92,34 +162,17 @@ class AddRegistrationTableViewController: UITableViewController, SelectRoomTypeT
     }
     
     @IBAction func doneBarButtonTapped(_ sender: UIBarButtonItem) {
-        let firstName = firstNameTextField.text ?? ""
-        let lastName = lastNameTextField.text ?? ""
-        let email = emailTextField.text ?? ""
-        let checkInDate = checkInDatePicker.date
-        let checkOutDate = checkOutDatePicker.date
-        let numberOfAdults = Int(numberOfAdultsStepper.value)
-        let numberOfChildren = Int(numberOfChildrenStepper.value)
-        let hasWifi = wifiSwitch.isOn
-        let roomChoice = roomType?.name ?? "Not Set"
         
-        print("DONE TAPPED")
-        print("firstName: \(firstName)")
-        print("lastName: \(lastName)")
-        print("email: \(email)")
-        print("checkIn: \(checkInDate)")
-        print("checkOut: \(checkOutDate)")
-        print("numberOfAdults: \(numberOfAdults)")
-        print("numberOfChildren: \(numberOfChildren)")
-        print("Wifi: \(hasWifi)")
-        print("roomType: \(roomChoice)")
     }
  
     @IBAction func DateInPickerValueChanged(_ sender: UIDatePicker) {
         updateDateViews()
+        updateChargesSection()
     }
     
     @IBAction func DateOutPickerValueChanged(_ sender: Any) {
         updateDateViews()
+        updateChargesSection()
     }
     
     override func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
@@ -146,7 +199,7 @@ class AddRegistrationTableViewController: UITableViewController, SelectRoomTypeT
     
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         tableView.deselectRow(at: indexPath, animated: true)
-        if indexPath == checkInDateLabelCellIndexPath &&        isCheckOutDatePickerVisible == false {
+        if indexPath == checkInDateLabelCellIndexPath && isCheckOutDatePickerVisible == false {
             // Check-in label selected, check-out picker is not visible, toggle check-in picker
             isCheckInDatePickerVisible.toggle()
         } else if indexPath == checkOutDateLabelCellIndexPath && isCheckInDatePickerVisible == false {
@@ -168,12 +221,14 @@ class AddRegistrationTableViewController: UITableViewController, SelectRoomTypeT
     }
     @IBAction func stepperValueChangedAdults(_ sender: UIStepper) {
         updateNumberOfGuests()
+        updateChargesSection()
     }
     @IBAction func stepperValueChangedChildren(_ sender: UIStepper) {
         updateNumberOfGuests()
+        updateChargesSection()
     }
     @IBAction func wifiSwitchChanged(_ sender: UISwitch) {
-
+        updateChargesSection()
     }
     
     func updateRoomType() {
@@ -182,10 +237,12 @@ class AddRegistrationTableViewController: UITableViewController, SelectRoomTypeT
         } else {
             roomTypeLabel.text = "Not Set"
         }
+        doneButton.isEnabled = registration != nil && existingRegistration == nil
     }
     func selectRoomTypeTableController(_ controller: SelectRoomTypeTableViewController, didSelect roomType: RoomType) {
         self.roomType = roomType
-        updateRoomType() 
+        updateRoomType()
+        updateChargesSection()
     }
     
     @IBSegueAction func selectRoomType(_ coder: NSCoder) -> SelectRoomTypeTableViewController? {
@@ -198,6 +255,37 @@ class AddRegistrationTableViewController: UITableViewController, SelectRoomTypeT
     
     @IBAction func cancelButtonTapped(_ sender: Any) {
         dismiss(animated: true)
+    }
+    
+    func updateChargesSection() {
+        let dateComponents = Calendar.current.dateComponents([.day], from: checkInDatePicker.date, to: checkOutDatePicker.date)
+        let numberOfNights = dateComponents.day ?? 0
+        
+        chargesNumberOfNightsLabel.text = "\(numberOfNights)"
+        chargesNumberOfNightsDetailLabel.text = "\(checkInDatePicker.date.formatted(date: .abbreviated, time: .omitted)) - \(checkOutDatePicker.date.formatted(date: .abbreviated, time: .omitted))"
+        
+        let roomRateTotal: Int
+        if let roomType = roomType {
+            roomRateTotal = roomType.price * numberOfNights
+            chargesRoomRateLabel.text = "$ \(roomRateTotal)"
+            chargesRoomTypeLabel.text = "\(roomType.name) @ $\(roomType.price)/night"
+        } else {
+            roomRateTotal = 0
+            chargesRoomRateLabel.text = "--"
+            chargesRoomTypeLabel.text = "--"
+        }
+        
+        
+        let wifiTotal: Int
+        if wifiSwitch.isOn {
+            wifiTotal = 10 * numberOfNights
+        } else {
+            wifiTotal = 0
+        }
+        chargesWifiRateLabel.text = "$ \(wifiTotal)"
+        chargesWifiDetailLabel.text = wifiSwitch.isOn ? "Yes" : "No"
+        
+        chargesTotalLabel.text = "$ \(roomRateTotal + wifiTotal)"
     }
     
 }

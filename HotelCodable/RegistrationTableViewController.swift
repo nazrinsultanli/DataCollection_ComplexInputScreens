@@ -41,12 +41,25 @@ class RegistrationTableViewController: UITableViewController {
     }
     
     @IBAction func unwindFromAddRegistration(unwindSegue:    UIStoryboardSegue) {
-        guard let addRegistrationTableViewController =        unwindSegue.source as? AddRegistrationTableViewController,
-              let registration =        addRegistrationTableViewController.registration else        {
+        guard let addRegistrationTableViewController = unwindSegue.source as? AddRegistrationTableViewController,
+              let registration = addRegistrationTableViewController.registration else        {
             return }
         registrations.append(registration)
         tableView.reloadData()
     }
+    
+    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
+        if segue.identifier == "showDetailSegue" {
+            if let addRegistrationViewController = segue.destination as? AddRegistrationTableViewController {
+                if let cell = sender as? UITableViewCell,
+                   let indexPath = tableView.indexPath(for: cell) {
+                    // Pass the selected registration to the destination controller
+                    addRegistrationViewController.existingRegistration = registrations[indexPath.row]
+                }
+            }
+        }
+    }
+
 
 
 }
